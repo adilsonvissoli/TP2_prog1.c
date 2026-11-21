@@ -3,11 +3,14 @@
 
 #define T 100
 
+//tipo inteiro estritamente positivo
 typedef unsigned int u_int;
 
+//criação do tipo string
 typedef char string[T];
 
-struct viatura {
+//tipos de dados de uma viatura
+typedef struct viatura {
     u_int codigo; // xx
     string tipo; //carro ou moto
     string fabricante; //marca
@@ -15,31 +18,28 @@ struct viatura {
     int producao; // ano de produção
     float valor; //valor de aquisição
     int situacao; //1 ativa, 0 parada
-};
-
-struct viatura via[T];
+} via[T];
 u_int qtd_via = 0;
-
 //toda nova ocorrencia entra como pendente
+
 struct data {
     int dia;
     int mes;
     int ano;
 };
 
-struct ocorrencia {
+//tipos de dados de uma ocorrência
+typedef struct ocorrencia {
     int codigo;
     string tipo; //assalto, latrocínio, roubo, furto, acidente de trânsito, estupro, estorção.
     struct data data; //struct de 3 ints
     string nome;
     int status; //1 atendida, 0 pendente
     int codigo_via;
-};
-
-struct ocorrencia ocr[T];
+} ocr[T];
 u_int qtd_ocr=0;
 
-//ESTRUTURA --> primeiro switch case para 1. 2. ou 3. --> segundo switch case para as funcoes de cada necessidade. (do while para rodar tudo pelo menos uma vez)
+//ESTRUTURA --> primeiro switch case para 1. 2. ou 3. --> segundo switch case para as funcoes de cada necessidade. (do while para rodar tudo pelo menos uma vez(em cada menu))
 
 //DECLARAÇÕES!!!
 //geral
@@ -52,7 +52,7 @@ void minusculo(string palavra);
 int verificacao_data(int dia, int mes, int ano);
 int opcao, opcao1, opcao2, opcao3;
 
-//case 1
+//FUNÇÕES RELACIONADAS A VIATURA
 struct viatura cadastrarVia(void);
 void listarVia(void);
 void ativas(void);
@@ -60,15 +60,15 @@ void modelo(void);
 void baixa(void);
 void verif(void);
 
-//case 2
+//FUNÇÕES RELACIONADAS A OCORRÊNCIAS
 struct ocorrencia cadastrarOcr(void);
 void listarOcr(void);
 void atendidas(void);
 void pendentes(void);
-void codigo(void);
-void tipo(void);
+void por_codigo(void);
+void por_tipo(void);
 
-//case 3
+//FUNÇÕES RELACIONADAS AO ATENDIMENTO DE OCORRÊNCIAS
 void atendimento(void);
 void PorVia(void);
 void PorTipo(void);
@@ -127,9 +127,9 @@ int main()
                                 break;
                         case 4: pendentes();
                                 break;
-                        case 5: codigo();       
+                        case 5: por_codigo();       
                                 break;
-                        case 6: tipo();
+                        case 6: por_tipo();
                                 break;
                         default: printf("Opção não existente!");
                         break;
@@ -325,7 +325,7 @@ int verificacao_data(int dia, int mes, int ano)
 }
 
 //--------------------
-//case 1
+//FUNÇÕES RELACIONADAS A VIATURA
 //--------------------
 
 struct viatura cadastrarVia(void)
@@ -333,61 +333,64 @@ struct viatura cadastrarVia(void)
     struct viatura aux;
     int verif_tipo=0, verif_producao=0, verif_valor=0, verif_situacao=0;
 
-    again:
-    verif_tipo=0, verif_producao=0, verif_valor=0, verif_situacao=0;
-    aux.codigo = qtd_via;
-    printf("\nCódigo..............:%02i\n", qtd_via);
-    
-    printf("Tipo................:");
-    fgets(aux.tipo, T, stdin);
-    aux.tipo[strlen(aux.tipo)-1] = '\0';
-    printf("Fabricante..........:");
-    fgets(aux.fabricante, T, stdin);
-    aux.fabricante[strlen(aux.fabricante)-1] = '\0';
-    printf("Modelo..............:");
-    fgets(aux.modelo, T, stdin);
-    aux.modelo[strlen(aux.modelo)-1] = '\0';
+    do{
+        //---------cadastro
+        verif_tipo=0, verif_producao=0, verif_valor=0, verif_situacao=0;
+        aux.codigo = qtd_via;
+        printf("\nCódigo..............:%02i\n", qtd_via);
+        
+        printf("Tipo................:");
+        fgets(aux.tipo, T, stdin);
+        aux.tipo[strlen(aux.tipo)-1] = '\0';
+        minusculo(aux.tipo);
 
-    printf("Ano de produção.....:");
-    scanf("%i", &aux.producao);
-    getchar();
-    printf("valor...............:");
-    scanf("%f", &aux.valor);
-    getchar();
+        printf("Fabricante..........:");
+        fgets(aux.fabricante, T, stdin);
+        aux.fabricante[strlen(aux.fabricante)-1] = '\0';
+        minusculo(aux.fabricante);
 
-    printf("Ativa --> 1 // Parada --> 0\n");
-    printf("Situação............:");
-    scanf("%i", &aux.situacao);
-    getchar();
+        printf("Modelo..............:");
+        fgets(aux.modelo, T, stdin);
+        aux.modelo[strlen(aux.modelo)-1] = '\0';
+        minusculo(aux.modelo);
 
-    //----------------VERIFICAÇÕES
-    //se nn for moto nem carro
-    if(!strcmp(aux.tipo, "Carro") || !strcmp(aux.tipo, "Moto")){
-        verif_tipo = 1;
-    } if(!verif_tipo){
-        printf("Erro no tipo. Digite novamente!\n");
-        goto again;
-    }
-    //muito extremo
-    if(aux.producao > 1800 && aux.producao <= 2026){
-        verif_producao = 1;
-    } if(!verif_producao){
-        printf("Erro no ano de produção. Tente novamente!\n");
-        goto again;
-    }
-    //entre cem milhoes e 1
-    if(aux.valor > 0 && aux.valor <= 100000000){
-        verif_valor = 1;
-    } if(!verif_valor){
-        printf("Erro no valor. Tente novamente!\n");
-        goto again;
-    }
-    // 0 ou 1
-    if(aux.situacao == 0 || aux.situacao == 1){
-        verif_situacao = 1;
-    } if(!verif_situacao){
-        printf("Erro na situação. Tente novamente!\n");
-        goto again;
+        printf("Ano de produção.....:");
+        scanf("%i", &aux.producao);
+        getchar();
+        printf("valor...............:");
+        scanf("%f", &aux.valor);
+        getchar();
+
+        printf("Ativa --> 1 // Parada --> 0\n");
+        printf("Situação............:");
+        scanf("%i", &aux.situacao);
+        getchar();
+
+        //----------------VERIFICAÇÕES
+        //se nn for moto nem carro
+        if(!strcmp(aux.tipo, "carro") || !strcmp(aux.tipo, "moto")){
+            verif_tipo = 1;
+        } if(!verif_tipo){
+            printf("Erro no tipo. Digite novamente!\n");
+        }
+        //muito extremo
+        if(aux.producao > 1800 && aux.producao <= 2027){
+            verif_producao = 1;
+        } if(!verif_producao){
+            printf("Erro no ano de produção. Tente novamente!\n");
+        }
+        //entre cem milhoes e 1
+        if(aux.valor > 0 && aux.valor <= 100000000){
+            verif_valor = 1;
+        } if(!verif_valor){
+            printf("Erro no valor. Tente novamente!\n");
+        }
+        // 0 ou 1
+        if(aux.situacao == 0 || aux.situacao == 1){
+            verif_situacao = 1;
+        } if(!verif_situacao){
+            printf("Erro na situação. Tente novamente!\n");
+        } while (!verif_tipo || !verif_producao || !verif_valor || !verif_situacao);
     }
 
     return aux; 
@@ -484,7 +487,7 @@ void verif(void)
 }
 
 //--------------------------
-//case 2
+//FUNÇÕES RELACIONADAS A OCORRÊNCIAS
 //--------------------------
 
 struct ocorrencia cadastrarOcr(void)
@@ -492,44 +495,50 @@ struct ocorrencia cadastrarOcr(void)
     struct ocorrencia aux;
     int verif_tipo = 0, verif_data = 0 ;
 
-    remake: 
-    verif_data = 0 ;
+    do{
+        //-------cadastro
+        verif_tipo = 0, verif_data = 0 ;
 
-    aux.codigo = qtd_ocr;
-    printf("Código..............: %02i", qtd_ocr);
+        aux.codigo = qtd_ocr;
+        printf("Código..............: %02i", qtd_ocr);
 
-    printf("\n-->Assalto, latrocínio, roubo, furto, acidente de trânsito, estupro, estorção.<--\n");
-    printf("Crime cometido......:");
-    fgets(aux.tipo, T, stdin);
-    aux.tipo[strlen(aux.tipo)-1] = '\0';
+        printf("\n-->Assalto, latrocínio, roubo, furto, acidente de trânsito, estupro, estorção.<--\n");
+        printf("Crime cometido......:");
+        fgets(aux.tipo, T, stdin);
+        aux.tipo[strlen(aux.tipo)-1] = '\0';
+        minusculo(aux.tipo);
 
-    printf("dia/mês/ano.........:");
-    scanf("%d/%d/%d", &aux.data.dia, &aux.data.mes, &aux.data.ano);
-    getchar();
+        printf("dia/mês/ano.........:");
+        scanf("%d/%d/%d", &aux.data.dia, &aux.data.mes, &aux.data.ano);
+        getchar();
 
-    printf("Nome completo do registrante....:");
-    fgets(aux.nome, T, stdin); 
-    aux.nome[strlen(aux.nome) -1] = '\0';
+        printf("Nome completo do registrante....:");
+        fgets(aux.nome, T, stdin); 
+        aux.nome[strlen(aux.nome) -1] = '\0';
 
-    minusculo(aux.tipo);
 
-    //---------------VERIFICACAO
-    if(!strcmp(aux.tipo, "assalto") || !strcmp(aux.tipo, "latrocínio") || !strcmp(aux.tipo, "roubo") || !strcmp(aux.tipo, "furto") || !strcmp(aux.tipo, "acidente de trânsito") || !strcmp(aux.tipo, "estupro") || !strcmp(aux.tipo, "estorção")){
-        verif_tipo = 1;
-    } if(!verif_tipo){
-        printf("Erro no crime cometido. Tente novamente!\n");
-        goto remake;
-    }
+        //---------------VERIFICACAO
+        if(!strcmp(aux.tipo, "assalto") ||
+            !strcmp(aux.tipo, "latrocínio") ||
+            !strcmp(aux.tipo, "roubo") ||
+            !strcmp(aux.tipo, "furto") ||
+            !strcmp(aux.tipo, "acidente de trânsito") ||
+            !strcmp(aux.tipo, "estupro") ||
+            !strcmp(aux.tipo, "estorção")){
+            verif_tipo = 1;
+        } if(!verif_tipo){
+            printf("Erro no crime cometido. Tente novamente!\n");
+        }
 
-    verif_data = verificacao_data(aux.data.dia, aux.data.mes, aux.data.ano);
+        verif_data = verificacao_data(aux.data.dia, aux.data.mes, aux.data.ano);
 
-    if(!verif_data){
-        printf("Erro no campus da data. Tente novamente!\n");
-        goto remake;
-    }
+        if(!verif_data){
+            printf("Erro no campus da data. Tente novamente!\n");
+        }
 
-    aux.status = 0;
-    aux.codigo_via = 0;
+        aux.status = 0;
+        aux.codigo_via = 0;
+    } while (!verif_tipo || !verif_data);
 
     return aux;
 }
@@ -559,7 +568,7 @@ void pendentes(void)
     }
 }
 
-void codigo(void)
+void por_codigo(void)
 {
     int teste = 0, encontrou = 0;
 
@@ -578,7 +587,7 @@ void codigo(void)
 }
 
 //Consulta ocorrência por tipo
-void tipo(void)
+void por_tipo(void)
 {
     string teste;
     int encontrou = 0;
@@ -600,7 +609,7 @@ void tipo(void)
 }
 
 //--------------------
-//case 3
+//FUNÇÕES RELACIONADAS AO ATENDIMENTO DE OCORRÊNCIAScase 3
 //-------------------- 
 
 void atendimento(void)
@@ -698,21 +707,26 @@ void PorInter(void)
     int inf, sup, data, encontrou = 0;
     int troca;
 
-    denovo:
-    int verif_data1 =0, verif_data2 =0;
-    printf("Digite as datas no formato: dd/mm/aaaa, primeiro a menor e depois a maior!\n");
-    printf("-->");
-    scanf("%d/%d/%d", &teste_dia1, &teste_mes1, &teste_ano1);
-    printf("-->");
-    scanf("%d/%d/%d", &teste_dia2, &teste_mes2, &teste_ano2);
+    do{
+        int verif_data1 =0, verif_data2 =0;
+        printf("Digite as datas no formato: dd/mm/aaaa, primeiro a menor e depois a maior!\n");
+        printf("-->");
+        scanf("%d/%d/%d", &teste_dia1, &teste_mes1, &teste_ano1);
+        printf("-->");
+        scanf("%d/%d/%d", &teste_dia2, &teste_mes2, &teste_ano2);
 
-    verif_data1 = verificacao_data(teste_dia1,teste_mes1,teste_ano1);
-    verif_data2 = verificacao_data(teste_dia2,teste_mes2,teste_ano2);
+        verif_data1 = verificacao_data(teste_dia1,teste_mes1,teste_ano1);
+        verif_data2 = verificacao_data(teste_dia2,teste_mes2,teste_ano2);
 
-    if(!(verif_data1 && verif_data2)){
-        printf("Alguma(s) data está forá do intervalor disponivel. Tente novamente!\n");
-        goto denovo;
-    }
+        if(!(verif_data1 && verif_data2)){
+            printf("Alguma(s) data está forá do intervalor disponivel. Tente novamente!\n");
+        }
+    } while (!verif_data1 || !verif_data2);
+
+    /*
+    IMPORTANTE, o modelo aaaa/mm/dd é o correto, substituir por dd/mm/aaaa.
+    Pode parecer é intuitivo, mas inverte a prioridade de "pesos" da data. 
+    */
 
     inf = teste_ano1 * 10000 + teste_mes1 * 100 + teste_dia1; //aaaa/mm/dd
     sup = teste_ano2 * 10000 + teste_mes2 * 100 + teste_dia2; //aaaa/mm/dd
